@@ -1,0 +1,69 @@
+******************************************
+ATENCAO   /   Como habilitar o display TFT
+******************************************
+
+Aqui seguem algumas dicas para configurar o ambiente do platformio com o módulo Pi Pico RP2040 com display redondo:
+
+1) Nessa pasta existem algunas arquivos que são alterados para que o projeto possa funcionar com o DISPLAY
+
+2) no arquivo platformio.ini temos que inserir a referencia da biblioteca TFT_eSPI
+        bodmer/TFT_eSPI
+
+3) No arquivo .pio\libdeps\pico\TFT_eSPI\TFT_Drivers\GC9A01_Defines.h:
+
+        Alterar a linha 4 para:
+            #define TFT_WIDTH  240
+
+        Alterar a linha 7 para:
+            #define TFT_HEIGHT 240
+
+
+4) Alterar na pasta /.pio/libdeps/pico/TFT_eSPI o arquivo User_Setup_Select.h:
+
+        Comentar a linha 30
+            //#include <User_Setup.h>           // Default setup is root library folder
+
+        DESCOMENTAR a linha 121
+            #include <User_Setups/Setup200_GC9A01.h>           // Setup file for ESP32 and GC9A01 240 x 240 TFT
+
+        ATENCAO: SOMENTE UMA LINHA PODE FICAR ATIVA!
+
+5) Para ver as diretivas que foram ativadas na etapa 3:
+
+        /.pio/libdeps/pico/TFT_eSPI/User_Setups/Setup200_GC9A01.h
+
+            ABAIXO TEMOS AS DIRETIVAS ALTERADAS PARA FICAR DE ACORDO COM AS LIGAÇÕES DO DISPLAY NO MODULO
+
+            // For PI Pico RP2040 Modulo com display integrado
+            // conforme mostra o disgrama de pinos nessa url:
+            // https://www.waveshare.com/rp2040-lcd-1.28.htm
+            // The hardware SPI can be mapped to any pins
+            #define TFT_MOSI 11 // GP11/  LCD_DIN / LCD MOSI
+            #define TFT_SCLK 10 // GP10 / LCD_CLK / LCD_CLK
+            #define TFT_CS   9  // GP9 / LCD_CS / LCD Ship Selection
+            #define TFT_DC   8  // GP8 / LCD_DC / LCD Command-Data Selection
+            #define TFT_RST  12 // GP12 / LCD_RST / LCD Reset
+            #define TFT_BL   25 // GP25 / LCD_BL / LCD Backlight Control
+
+6) No arquivo /src/main.cpp, deve conter a diretiva:
+
+        #include <TFT_eSPI.h>
+
+        Para que a biblioteca de funcoes do objeto de display TFT fique disponivel.
+
+7) O PLATFORMIO nao vai fazer o flashing do binario da forma tradicional, como com ESP32, entao temos que fazer o seguinte:
+
+        6.1 ) Instalar o driver USB generico:
+
+            https://zadig.akeo.ie/
+
+            e de acordo com esse script:
+            https://community.platformio.org/t/raspberry-pi-pico-rp2040-will-not-upload-when-using-my-windows-pc-all-other-boards-work/29852
+
+            Please plug in the Pico in bootloader mode (hold down BOOTSEL and keep it pressed while inserting the USB cable) and show a screenshot of devices in Zadig with Options → List all Devices turned on.
+
+            Update I was able to pull it back up and re-do the drivers but it still doesn’t pop up on any communication port. Everything still works fine for all arduinos as well
+
+
+
+
